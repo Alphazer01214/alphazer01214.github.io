@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Alpha_零能</title>
+  <title>Alpha_零能 的个人网站</title>
   
   
-  <link href="http://example.com/atom.xml" rel="self"/>
+  <link href="http://alphazer01214.github.io/atom.xml" rel="self"/>
   
-  <link href="http://example.com/"/>
+  <link href="http://alphazer01214.github.io/"/>
   <updated>2025-01-08T15:39:02.394Z</updated>
-  <id>http://example.com/</id>
+  <id>http://alphazer01214.github.io/</id>
   
   <author>
     <name>Alpha_零能</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>算法学习笔记——Merge Sort</title>
-    <link href="http://example.com/2025/01/08/Merge-Sort/"/>
-    <id>http://example.com/2025/01/08/Merge-Sort/</id>
+    <link href="http://alphazer01214.github.io/2025/01/08/Merge-Sort/"/>
+    <id>http://alphazer01214.github.io/2025/01/08/Merge-Sort/</id>
     <published>2025-01-08T15:20:36.000Z</published>
     <updated>2025-01-08T15:39:02.394Z</updated>
     
@@ -34,14 +34,14 @@
     
     
     
-    <category term="Algorithms" scheme="http://example.com/tags/Algorithms/"/>
+    <category term="Algorithms" scheme="http://alphazer01214.github.io/tags/Algorithms/"/>
     
   </entry>
   
   <entry>
     <title>Alphazer01214&#39;s First Post</title>
-    <link href="http://example.com/2025/01/08/Alphazer01214-s-First-Post/"/>
-    <id>http://example.com/2025/01/08/Alphazer01214-s-First-Post/</id>
+    <link href="http://alphazer01214.github.io/2025/01/08/Alphazer01214-s-First-Post/"/>
+    <id>http://alphazer01214.github.io/2025/01/08/Alphazer01214-s-First-Post/</id>
     <published>2025-01-08T13:30:34.000Z</published>
     <updated>2025-01-08T13:52:52.363Z</updated>
     
