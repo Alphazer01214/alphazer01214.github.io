@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Alpha_零能 的个人网站</title>
+  <title>零能Blog</title>
   
-  
+  <subtitle>Alpha_零能的个人主页</subtitle>
   <link href="http://alphazer01214.github.io/atom.xml" rel="self"/>
   
   <link href="http://alphazer01214.github.io/"/>
