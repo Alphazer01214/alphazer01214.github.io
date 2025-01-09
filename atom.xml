@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Alpha_零能</title>
+  
+  
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2025-01-08T15:39:02.394Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>Alpha_零能</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>算法学习笔记——Merge Sort</title>
+    <link href="http://example.com/2025/01/08/Merge-Sort/"/>
+    <id>http://example.com/2025/01/08/Merge-Sort/</id>
+    <published>2025-01-08T15:20:36.000Z</published>
+    <updated>2025-01-08T15:39:02.394Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="归并排序的主要思想"><a href="#归并排序的主要思想" class="headerlink" title="归并排序的主要思想"></a>归并排序的主要思想</h1><p><strong>归</strong>——将数组分成两部分，分别进行排序。<br><strong>并</strong>——将已经排序的两个数组合并起来。</p><p>“并”的部分对于我而言有点难以理解，接下来的重点会放在“并”上面。</p><h1 id="代码实现——步骤一"><a href="#代码实现——步骤一" class="headerlink" title="代码实现——步骤一"></a>代码实现——步骤一</h1><p>第一步就是使用递归将数组二分，关键在于利用下标实现二分操作。</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">merge_sort</span><span class="hljs-params">(<span class="hljs-type">int</span> arr[], <span class="hljs-type">int</span> left, <span class="hljs-type">int</span> right)</span>&#123;<br>    <span class="hljs-comment">// left right are index</span><br>    <span class="hljs-keyword">if</span>(left &gt;= right)&#123;<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-type">int</span> mid = (right+left)/<span class="hljs-number">2</span>;<br>        merge_sort(arr, left, mid);<br>        merge_sort(arr, mid+<span class="hljs-number">1</span>, right);<br>        msort(arr, left, right, mid);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure><h2 id="代码解释"><a href="#代码解释" class="headerlink" title="代码解释"></a>代码解释</h2><p>递归需要终止条件，当长度为1，利用下标表示就是left&gt;&#x3D;right，此时递归结束，返回上一级。<br>接着将二分的索引作为参数（就是新二分出来数组的left，right），进行递归操作，实现原数组的对半分。<br>分割操作之后是msort，稍后讲解。<br>注意：<strong>整个过程中arr本身的长度都是不变的</strong>！而且arr的索引还是从0开始到结束，也就是说，我们并不是真的将数组分割成了一个一个新数组，<strong>我们都是在原数组上进行操作</strong>，我们所有操作都是通过下标实现的。</p><h1 id="代码实现——步骤二"><a href="#代码实现——步骤二" class="headerlink" title="代码实现——步骤二"></a>代码实现——步骤二</h1><p>对于一次并，示意图如下：<br><img src="/mergesort.png" alt="归并示意图"></p><ol><li>我们假设有两个<strong>已排序</strong>的数组（假设已排序，这样就能先解决将两数组合并的问题）</li><li>这两个数组被拼成了一个数组，下标如图所示</li><li>对这么一个数组进行排序，只需要一次遍历操作<br>我们引入两个类似指针的变量<strong>i, j</strong>，一个指向这个数组的开头，一个指向中间，那么我们就能通过比较<strong>i, j</strong>索引对应的值来进行排序。<br>如果只有这一个数组，排序有些困难，于是我们选择引入新的数组（即复制一遍原数组），然后<strong>把排序结果保存回原数组</strong>。<br>注意：我们这里加入了<strong>left、right、mid</strong>变量来获取这个数组的开头、结尾与中间，其中这三个变量都是索引值。</li></ol><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> tmp_arr[right];<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = left; i &lt;= right; i++)&#123;<br>    <span class="hljs-comment">// copy to a temp arr</span><br>    tmp_arr[i] = arr[i];<br>&#125;<br><span class="hljs-type">int</span> i = left, j = mid+<span class="hljs-number">1</span>;<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k = left; k &lt;= right; k++)&#123;<br>    <span class="hljs-keyword">if</span>(i &gt; mid)&#123;<br>        arr[k] = tmp_arr[j++];<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<span class="hljs-keyword">else</span><br>    <span class="hljs-keyword">if</span>(j &gt; right)&#123;<br>        arr[k] = tmp_arr[i++];<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>    <span class="hljs-keyword">if</span>(tmp_arr[i] &lt; tmp_arr[j])&#123;<br>        arr[k] = tmp_arr[i++];<br>    &#125;<span class="hljs-keyword">else</span><br>    <span class="hljs-keyword">if</span>(tmp_arr[i] &gt;= tmp_arr[j])&#123;<br>        arr[k] = tmp_arr[j++];<br>    &#125;<br>&#125;<br>        <br></code></pre></td></tr></table></figure><h2 id="代码解释-1"><a href="#代码解释-1" class="headerlink" title="代码解释"></a>代码解释</h2><p>在自行实现归并排序的过程中，最纠结的就是如何规定数组的长度，但实际上长度并不重要，因为最后都可以按照其索引值将结果复制回原数组。<br>在分成单个数组时，回到了上一步两个数组的状态，而这两个数组长度一定小于等于2，由于msort的过程中一次只能处理一个数组，因此实际上，msort是先分别排序了这两个数组，它们混合进了arr[]，然后再进入msort进行排序。</p><h1 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h1><p>在面对元素较少的数组时，可以考虑其它排序方法。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>其实我认为“将数组分割再合并”的说法非常令人费解，因为这样就会让人有“把两个数组传进一个函数，这个函数去把这两个数组首尾相接拼起来”的感觉，这种操作如何用递归实现？我还没有探索过。</p><p>实际上可以理解成，含n个元素的一个数组arr，我们先是有n个指针指着各个元素，然后两个两个比较大小&#x2F;对调元素，接下来指针减半（两个指针之间间隔一个位置），然后4个一组，每组有两个指针，进行比大小与对换元素的操作，然后指针再减半，以此类推</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;归并排序的主要思想&quot;&gt;&lt;a href=&quot;#归并排序的主要思想&quot; class=&quot;headerlink&quot; title=&quot;归并排序的主要思想&quot;&gt;&lt;/a&gt;归并排序的主要思想&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;归&lt;/strong&gt;——将数组分成两部分，分别进行排序。&lt;br&gt;&lt;s</summary>
+      
+    
+    
+    
+    
+    <category term="Algorithms" scheme="http://example.com/tags/Algorithms/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Alphazer01214&#39;s First Post</title>
+    <link href="http://example.com/2025/01/08/Alphazer01214-s-First-Post/"/>
+    <id>http://example.com/2025/01/08/Alphazer01214-s-First-Post/</id>
+    <published>2025-01-08T13:30:34.000Z</published>
+    <updated>2025-01-08T13:52:52.363Z</updated>
+    
+    <content type="html"><![CDATA[<p>Hello World!</p><p>I created my very first page during my exam week.</p><p>By the way, it’s also my birthday.</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;Hello World!&lt;/p&gt;
+&lt;p&gt;I created my very first page during my exam week.&lt;/p&gt;
+&lt;p&gt;By the way, it’s also my birthday.&lt;/p&gt;
+</summary>
+      
+    
+    
+    
+    
+  </entry>
+  
+</feed>
