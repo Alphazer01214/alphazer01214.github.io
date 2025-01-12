@@ -1,8 +1,9 @@
+http://alphazer01214.github.io/2025/01/08/Merge-Sort/
 http://alphazer01214.github.io/link/index.html
 http://alphazer01214.github.io/about/index.html
 http://alphazer01214.github.io/tags/index.html
 http://alphazer01214.github.io/categories/index.html
-http://alphazer01214.github.io/2025/01/08/Merge-Sort/
 http://alphazer01214.github.io/2025/01/08/Alphazer01214-s-First-Post/
 http://alphazer01214.github.io/
 http://alphazer01214.github.io/tags/Algorithms/
+http://alphazer01214.github.io/categories/Computer-Science/

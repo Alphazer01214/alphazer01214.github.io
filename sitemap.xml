@@ -2,9 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://alphazer01214.github.io/2025/01/08/Merge-Sort/</loc>
+    
+    <lastmod>2025-01-12</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://alphazer01214.github.io/link/index.html</loc>
     
-    <lastmod>2025-01-09</lastmod>
+    <lastmod>2025-01-11</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -13,7 +22,7 @@
   <url>
     <loc>http://alphazer01214.github.io/about/index.html</loc>
     
-    <lastmod>2025-01-09</lastmod>
+    <lastmod>2025-01-10</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -38,15 +47,6 @@
   </url>
   
   <url>
-    <loc>http://alphazer01214.github.io/2025/01/08/Merge-Sort/</loc>
-    
-    <lastmod>2025-01-08</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>http://alphazer01214.github.io/2025/01/08/Alphazer01214-s-First-Post/</loc>
     
     <lastmod>2025-01-08</lastmod>
@@ -58,7 +58,7 @@
 
   <url>
     <loc>http://alphazer01214.github.io/</loc>
-    <lastmod>2025-01-09</lastmod>
+    <lastmod>2025-01-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -66,11 +66,18 @@
   
   <url>
     <loc>http://alphazer01214.github.io/tags/Algorithms/</loc>
-    <lastmod>2025-01-09</lastmod>
+    <lastmod>2025-01-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
 
+  
+  <url>
+    <loc>http://alphazer01214.github.io/categories/Computer-Science/</loc>
+    <lastmod>2025-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
   
 </urlset>
