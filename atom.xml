@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>零能Blog</title>
+  <title>Alphazer01214’s Blog</title>
   
   <subtitle>Alpha_零能的个人主页</subtitle>
   <link href="http://alphazer01214.github.io/atom.xml" rel="self"/>
   
   <link href="http://alphazer01214.github.io/"/>
-  <updated>2025-01-12T17:57:52.658Z</updated>
+  <updated>2025-01-17T10:46:34.646Z</updated>
   <id>http://alphazer01214.github.io/</id>
   
   <author>
@@ -17,11 +17,187 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>算法学习笔记——滑动窗口</title>
+    <link href="http://alphazer01214.github.io/2025/01/17/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/"/>
+    <id>http://alphazer01214.github.io/2025/01/17/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/</id>
+    <published>2025-01-17T09:40:08.000Z</published>
+    <updated>2025-01-17T10:46:34.646Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><p>给你一个整数数组 <code>nums</code>，有一个大小为 <code>k</code> 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 <code>k</code> 个数字。滑动窗口每次只向右移动一位。</p><p>返回 <em>滑动窗口中的最大值</em> 。</p><h1 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h1><p>考虑利用一个<strong>单调的</strong>双端队列（deque）实现对区间最大值的维护。这个deque的前端就是这个区间的最大值，而其后续的部分则是接下来的窗口中有可能取到的最大值。</p><p>再考虑一个双指针，中间的部分即为窗口。我们只需要考虑left和right的元素即可。</p><p>例如：</p><blockquote><p>输入：nums &#x3D; [1,3,-1,-3,5,3,6,7], k &#x3D; 3</p></blockquote><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">滑动窗口的位置                最大值             deque<br>---------------               -----          --------<br>[1  3  -1] -3  5  3  6  7       3             3, -1<br> 1 [3  -1  -3] 5  3  6  7       3             3, -1, -3<br> 1  3 [-1  -3  5] 3  6  7       5             5<br> 1  3  -1 [-3  5  3] 6  7       5             5, 3<br> 1  3  -1  -3 [5  3  6] 7       6             6<br> 1  3  -1  -3  5 [3  6  7]      7             7<br></code></pre></td></tr></table></figure><p>对于最开始的3个，最大值是3，然而在窗口向右移动时，若3弹出，-1有可能成为某个区间的最大值，因此在deque中保留了-1.</p><p>当5进入，它比deque中任何一个元素都大（只要它比deque front大），所以deque全部pop，并加入5.</p><p>如果进入的某个元素不大于deque front，却大于deque back，那么deque中比这个元素小的数在今后的区间内就不会成为最大值了，因此将其全部pop。</p><p>然而在实现的过程中，最令我困惑的是，窗口左端何时出，右端何时入。</p><p>声明需要的变量。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs C++">deque&lt;<span class="hljs-type">int</span>&gt; q;<br>vector&lt;<span class="hljs-type">int</span>&gt; res;<br><span class="hljs-type">int</span> left = <span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> right = <span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> len = nums.<span class="hljs-built_in">size</span>();<br></code></pre></td></tr></table></figure><p>首先解决前k个的问题。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">while</span>(right &lt; k)&#123;<br>    <span class="hljs-keyword">if</span>(nums[right] &gt; q.<span class="hljs-built_in">front</span>())&#123;<br>        <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>())&#123;<br>            q.<span class="hljs-built_in">pop_back</span>();<br>        &#125;<br>        q.<span class="hljs-built_in">push_front</span>(nums[right]);<br>    &#125;<span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>() &amp;&amp; nums[right] &gt; q.<span class="hljs-built_in">back</span>())&#123;<br>            q.<span class="hljs-built_in">pop_back</span>();<br>        &#125;<br>        q.<span class="hljs-built_in">push_back</span>(nums[right]);<br>    &#125;<br>    right++;<br>&#125;<br>res.<span class="hljs-built_in">push_back</span>(q.<span class="hljs-built_in">front</span>());<br></code></pre></td></tr></table></figure><p>再看其余的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">while</span>(right &lt; len)&#123;<br>    <span class="hljs-keyword">if</span>(nums[left] == q.<span class="hljs-built_in">front</span>())&#123;<br>        q.<span class="hljs-built_in">pop_front</span>();<br>    &#125;<br>    <span class="hljs-keyword">if</span>(nums[right] &gt; q.<span class="hljs-built_in">front</span>())&#123;<br>        <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>())&#123;<br>            q.<span class="hljs-built_in">pop_front</span>();<br>        &#125;<br>        q.<span class="hljs-built_in">push_front</span>(nums[right]);<br>    &#125;<span class="hljs-keyword">else</span> <br>    <span class="hljs-keyword">if</span>(nums[right] &lt;= q.<span class="hljs-built_in">front</span>())&#123;<br>        <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>() &amp;&amp; q.<span class="hljs-built_in">back</span>() &lt; nums[right])&#123;<br>            q.<span class="hljs-built_in">pop_back</span>();<br>        &#125;<br>        q.<span class="hljs-built_in">push_back</span>(nums[right]);<br>    &#125;<br>    right++;<br>    left++;<br>    res.<span class="hljs-built_in">push_back</span>(q.<span class="hljs-built_in">front</span>());<br>&#125;<br></code></pre></td></tr></table></figure><p>事实上，我们需要使此后的区间长度为k+1，因为需要判断front是否需要弹出。</p><h1 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs C++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">maxSlidingWindow</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        deque&lt;<span class="hljs-type">int</span>&gt; q;<br>        vector&lt;<span class="hljs-type">int</span>&gt; res;<br>        <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> right = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> len = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">while</span>(right &lt; k)&#123;<br>            <span class="hljs-keyword">if</span>(nums[right] &gt; q.<span class="hljs-built_in">front</span>())&#123;<br>                <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>())&#123;<br>                    q.<span class="hljs-built_in">pop_back</span>();<br>                &#125;<br>                q.<span class="hljs-built_in">push_front</span>(nums[right]);<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>() &amp;&amp; nums[right] &gt; q.<span class="hljs-built_in">back</span>())&#123;<br>                    q.<span class="hljs-built_in">pop_back</span>();<br>                &#125;<br>                q.<span class="hljs-built_in">push_back</span>(nums[right]);<br>            &#125;<br>            right++;<br>        &#125;<br>        res.<span class="hljs-built_in">push_back</span>(q.<span class="hljs-built_in">front</span>());<br>        <span class="hljs-keyword">while</span>(right &lt; len)&#123;<br>            <span class="hljs-keyword">if</span>(nums[left] == q.<span class="hljs-built_in">front</span>())&#123;<br>                q.<span class="hljs-built_in">pop_front</span>();<br>            &#125;<br>            <span class="hljs-keyword">if</span>(nums[right] &gt; q.<span class="hljs-built_in">front</span>())&#123;<br>                <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>())&#123;<br>                    q.<span class="hljs-built_in">pop_front</span>();<br>                &#125;<br>                q.<span class="hljs-built_in">push_front</span>(nums[right]);<br>            &#125;<span class="hljs-keyword">else</span> <br>            <span class="hljs-keyword">if</span>(nums[right] &lt;= q.<span class="hljs-built_in">front</span>())&#123;<br>                <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>() &amp;&amp; q.<span class="hljs-built_in">back</span>() &lt; nums[right])&#123;<br>                    q.<span class="hljs-built_in">pop_back</span>();<br>                &#125;<br>                q.<span class="hljs-built_in">push_back</span>(nums[right]);<br>            &#125;<br>            right++;<br>            left++;<br>            res.<span class="hljs-built_in">push_back</span>(q.<span class="hljs-built_in">front</span>());<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;题目描述&quot;&gt;&lt;a href=&quot;#题目描述&quot; class=&quot;headerlink&quot; title=&quot;题目描述&quot;&gt;&lt;/a&gt;题目描述&lt;/h1&gt;&lt;p&gt;给你一个整数数组 &lt;code&gt;nums&lt;/code&gt;，有一个大小为 &lt;code&gt;k&lt;/code&gt; 的滑动窗口从数组的最左侧移</summary>
+      
+    
+    
+    
+    <category term="Computer Science" scheme="http://alphazer01214.github.io/categories/Computer-Science/"/>
+    
+    
+    <category term="算法" scheme="http://alphazer01214.github.io/tags/%E7%AE%97%E6%B3%95/"/>
+    
+    <category term="数据结构" scheme="http://alphazer01214.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+    <category term="队列" scheme="http://alphazer01214.github.io/tags/%E9%98%9F%E5%88%97/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>算法学习笔记——堆、优先队列</title>
+    <link href="http://alphazer01214.github.io/2025/01/15/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%A0%86%E3%80%81%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/"/>
+    <id>http://alphazer01214.github.io/2025/01/15/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%A0%86%E3%80%81%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/</id>
+    <published>2025-01-14T23:48:43.000Z</published>
+    <updated>2025-01-17T10:46:42.012Z</updated>
+    
+    <content type="html"><![CDATA[<p>这个页面等待填充。</p><p><a href="https://leetcode.cn/problems/maximum-number-of-eaten-apples/description/">https://leetcode.cn/problems/maximum-number-of-eaten-apples/description/</a></p><p><a href="https://leetcode.cn/problems/design-task-manager/description/">https://leetcode.cn/problems/design-task-manager/description/</a></p><p>股票买卖问题：若可同时持有多支股票，那么如何决策获得收益最大？</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;这个页面等待填充。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.cn/problems/maximum-number-of-eaten-apples/description/&quot;&gt;https://leetcode.cn/problems/maximum-</summary>
+      
+    
+    
+    
+    <category term="Computer Science" scheme="http://alphazer01214.github.io/categories/Computer-Science/"/>
+    
+    
+    <category term="算法" scheme="http://alphazer01214.github.io/tags/%E7%AE%97%E6%B3%95/"/>
+    
+    <category term="数据结构" scheme="http://alphazer01214.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+    <category term="队列" scheme="http://alphazer01214.github.io/tags/%E9%98%9F%E5%88%97/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>算法学习笔记——图的记忆化遍历</title>
+    <link href="http://alphazer01214.github.io/2025/01/15/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%9B%BE%E7%9A%84%E8%AE%B0%E5%BF%86%E5%8C%96%E9%81%8D%E5%8E%86/"/>
+    <id>http://alphazer01214.github.io/2025/01/15/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%9B%BE%E7%9A%84%E8%AE%B0%E5%BF%86%E5%8C%96%E9%81%8D%E5%8E%86/</id>
+    <published>2025-01-14T23:38:15.000Z</published>
+    <updated>2025-01-17T10:22:54.857Z</updated>
+    
+    <content type="html"><![CDATA[<p>这个页面待填充。</p><h1 id="ABC351D-Grid-and-Magnet"><a href="#ABC351D-Grid-and-Magnet" class="headerlink" title="[ABC351D] Grid and Magnet"></a>[ABC351D] Grid and Magnet</h1><h2 id="题面翻译"><a href="#题面翻译" class="headerlink" title="题面翻译"></a>题面翻译</h2><p>有一个用字符类型表示的 $H$ 行 $W$ 列的地图 $S$，如果 $S_{i,j}$ 是字符 <code>.</code> 则代表这一格是空地，如果是 <code>#</code> 则代表这一格上有一个磁铁。现有一个小人从一个格子上出发，每次可以到达与之相邻（上、下、左、右）的四个格子，但如果有一个磁铁与之相邻（上下左右的四个格子中至少有一个磁铁）他就不能动了。求小人从某一格出发，经过任意多次运动，可以到达的格子的最大数量。</p><h2 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式"></a>输入格式</h2><p>入力は以下の形式で標準入力から与えられる。</p><blockquote><p>$ H $ $ W $ $ S_1 $ $ S_2 $ $ \vdots $ $ S_H $</p></blockquote><h2 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h2><p>マス目のうち磁石が置かれていないマスの中における、マスの自由度の最大値を出力せよ。</p><h3 id="样例输入-1"><a href="#样例输入-1" class="headerlink" title="样例输入 #1"></a>样例输入 #1</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">3 5<br>.#...<br>.....<br>.#..#<br></code></pre></td></tr></table></figure><h3 id="样例输出-1"><a href="#样例输出-1" class="headerlink" title="样例输出 #1"></a>样例输出 #1</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">9<br></code></pre></td></tr></table></figure><h3 id="样例输入-2"><a href="#样例输入-2" class="headerlink" title="样例输入 #2"></a>样例输入 #2</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">3 3<br>..#<br>#..<br>..#<br></code></pre></td></tr></table></figure><h3 id="样例输出-2"><a href="#样例输出-2" class="headerlink" title="样例输出 #2"></a>样例输出 #2</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">1<br></code></pre></td></tr></table></figure><h3 id="制約"><a href="#制約" class="headerlink" title="制約"></a>制約</h3><ul><li>$ 1\leq\ H,W\leq\ 1000 $</li><li>$ H,W $ は整数</li><li>$ S_i $ は <code>.</code> と <code>#</code> のみからなる長さ $ W $ の文字列</li><li>磁石の置かれていないマスが少なくとも $ 1 $ つ存在する。</li></ul><h3 id="Sample-Explanation-1"><a href="#Sample-Explanation-1" class="headerlink" title="Sample Explanation 1"></a>Sample Explanation 1</h3><p>上から $ i $ 行目かつ左から $ j $ 列目のマスを $ (i,j) $ で表します。 高橋君が最初に $ (2,3) $ にいるとき、高橋君の移動の例としては次のようなものなどが考えられます。 - $ (2,3)\to\ (2,4)\to\ (1,4)\to\ (1,5)\to\ (2,5) $ - $ (2,3)\to\ (2,4)\to\ (3,4) $ - $ (2,3)\to\ (2,2) $ - $ (2,3)\to\ (1,3) $ - $ (2,3)\to\ (3,3) $ よって、途中で到達しているマスも含めて高橋君は $ (2,3) $ から少なくとも $ 9 $ 個のマスに到達することができます。 一方、これら以外のマスには到達することができないため、$ (2,3) $ の自由度は $ 9 $ となります。 これは磁石が置かれていない各マスの自由度のうち最大であるため、$ 9 $ を出力します。</p><h3 id="Sample-Explanation-2"><a href="#Sample-Explanation-2" class="headerlink" title="Sample Explanation 2"></a>Sample Explanation 2</h3><p>磁石が置かれていないどのマスについても、上下左右に隣り合うマスのいずれかに磁石が置かれています。 よって、磁石が置かれていないどのマスからも移動することはできず、マスの自由度は $ 1 $ となります。 そのため、$ 1 $ を出力します。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;这个页面待填充。&lt;/p&gt;
+&lt;h1 id=&quot;ABC351D-Grid-and-Magnet&quot;&gt;&lt;a href=&quot;#ABC351D-Grid-and-Magnet&quot; class=&quot;headerlink&quot; title=&quot;[ABC351D] Grid and Magnet&quot;&gt;&lt;/a</summary>
+      
+    
+    
+    
+    <category term="Computer Science" scheme="http://alphazer01214.github.io/categories/Computer-Science/"/>
+    
+    
+    <category term="算法" scheme="http://alphazer01214.github.io/tags/%E7%AE%97%E6%B3%95/"/>
+    
+    <category term="图论" scheme="http://alphazer01214.github.io/tags/%E5%9B%BE%E8%AE%BA/"/>
+    
+    <category term="数据结构" scheme="http://alphazer01214.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>知更鸟专辑</title>
+    <link href="http://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/"/>
+    <id>http://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/</id>
+    <published>2025-01-14T15:29:32.000Z</published>
+    <updated>2025-01-17T10:31:12.738Z</updated>
+    
+    <content type="html"><![CDATA[<p>It’s actually a test.</p><p>试试加入图片。</p><p><img src="/img/1.jpg" alt="1"></p><p><img src="/img/2.jpg" alt="2"></p><p><img src="/img/3.jpg" alt="3"></p><p>虽然专辑到手了，但光驱还差个电源线（悲）</p><p>试了好几次终于是能显示图片了，图片资源放在img文件夹中，还不知道要怎么实现单独给post开个资源文件夹，img文件夹的资源是网站共享的，而且在Typora编辑的时候没办法看到图片（悲）</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;It’s actually a test.&lt;/p&gt;
+&lt;p&gt;试试加入图片。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/1.jpg&quot; alt=&quot;1&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2.jpg&quot; alt=&quot;2&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/3.</summary>
+      
+    
+    
+    
+    <category term="Routine" scheme="http://alphazer01214.github.io/categories/Routine/"/>
+    
+    
+    <category term="二次元" scheme="http://alphazer01214.github.io/tags/%E4%BA%8C%E6%AC%A1%E5%85%83/"/>
+    
+    <category term="游戏" scheme="http://alphazer01214.github.io/tags/%E6%B8%B8%E6%88%8F/"/>
+    
+    <category term="音乐" scheme="http://alphazer01214.github.io/tags/%E9%9F%B3%E4%B9%90/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Markdown Cheatsheet</title>
+    <link href="http://alphazer01214.github.io/2025/01/13/Markdown-Cheatsheet/"/>
+    <id>http://alphazer01214.github.io/2025/01/13/Markdown-Cheatsheet/</id>
+    <published>2025-01-13T13:51:28.000Z</published>
+    <updated>2025-01-17T10:44:07.279Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="这是一个Markdown语法的速查表"><a href="#这是一个Markdown语法的速查表" class="headerlink" title="这是一个Markdown语法的速查表"></a>这是一个Markdown语法的速查表</h1><h1 id="标题语法"><a href="#标题语法" class="headerlink" title="标题语法"></a>标题语法</h1><p>在HTML中，标题采用”<code>&lt;h1&gt;、&lt;h2&gt;</code>“等标签，在Markdown中，这被简化为了“#”。你可以使用一定数量的”#”用于标识一级、二级乃至更多级的标题。注意：<strong>&quot;#&quot; 与标题文字之间需要一个空格</strong>。</p><blockquote><h2 id="这是一级标题"><a href="#这是一级标题" class="headerlink" title="这是一级标题"></a>这是一级标题</h2><h3 id="这是二级标题"><a href="#这是二级标题" class="headerlink" title="这是二级标题"></a>这是二级标题</h3></blockquote><p>由于Markdown是兼容HTML的，因此我们可以使用HTML的样式语法对文档标题进行修饰。</p><p>例如，若要居中标题，可以使用如下语法：</p><p><code>&lt;h1 align=center&gt; 居中标题 &lt;/h1&gt;</code></p><p>效果：</p><blockquote><h2 align=center> 居中标题 </h2></blockquote><p>还有更多的语法可供使用，例如：</p><p><code>&lt;center&gt; &lt;h1&gt; Center Title &lt;/h1&gt; &lt;/center&gt;</code></p><p>其中，单独的center标签表示为文字居中。</p><h1 id="段落语法"><a href="#段落语法" class="headerlink" title="段落语法"></a>段落语法</h1><p>Markdown中，如果需要换行，请打两次回车键。当然，也可以使用HTML语法。</p><p><code>&lt;p&gt; 这是一个段落的第一行 &lt;br&gt; 这是第二行 &lt;/p&gt;</code></p><p>效果：</p><blockquote><p> 这是一个段落的第一行 <br> 这是第二行 </p></blockquote><h1 id="转义方法"><a href="#转义方法" class="headerlink" title="转义方法"></a>转义方法</h1><p>写这篇文章的时候就发现，要把Markdown语法给端上来还是需要一些操作的，否则这些就会被自动渲染。</p><h2 id="方法一：使用反斜杠"><a href="#方法一：使用反斜杠" class="headerlink" title="方法一：使用反斜杠 \"></a>方法一：使用反斜杠 \</h2><p># &lt;h1&gt; **** </p><h2 id="方法二：使用代码段"><a href="#方法二：使用代码段" class="headerlink" title="方法二：使用代码段 &#96;&#96;"></a>方法二：使用代码段 &#96;&#96;</h2><p><code>&lt;h1&gt;&lt;h2&gt; # **</code></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;这是一个Markdown语法的速查表&quot;&gt;&lt;a href=&quot;#这是一个Markdown语法的速查表&quot; class=&quot;headerlink&quot; title=&quot;这是一个Markdown语法的速查表&quot;&gt;&lt;/a&gt;这是一个Markdown语法的速查表&lt;/h1&gt;&lt;h1 id=&quot;标</summary>
+      
+    
+    
+    
+    <category term="Productivity" scheme="http://alphazer01214.github.io/categories/Productivity/"/>
+    
+    
+    <category term="Markdown" scheme="http://alphazer01214.github.io/tags/Markdown/"/>
+    
+    <category term="LaTeX" scheme="http://alphazer01214.github.io/tags/LaTeX/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>有序链表的合并——答案倒推原理</title>
+    <link href="http://alphazer01214.github.io/2025/01/13/%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8%E7%9A%84%E5%90%88%E5%B9%B6/"/>
+    <id>http://alphazer01214.github.io/2025/01/13/%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8%E7%9A%84%E5%90%88%E5%B9%B6/</id>
+    <published>2025-01-13T03:13:06.000Z</published>
+    <updated>2025-01-16T16:40:40.322Z</updated>
+    
+    <content type="html"><![CDATA[<p><em>该题是LeetCode的第23题</em></p><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个链表数组，每个链表都已经按升序排列。</p><p>请你将所有链表合并到一个升序链表中，返回合并后的链表。</p><p>例如：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">输入：lists = [[1,4,5],[1,3,4],[2,6]]<br>输出：[1,1,2,3,4,4,5,6]<br></code></pre></td></tr></table></figure><h2 id="思路分析与代码解析"><a href="#思路分析与代码解析" class="headerlink" title="思路分析与代码解析"></a>思路分析与代码解析</h2><p>典型的归并排序问题，在先前的文章中也提到归并排序是如何通过递归来实现的，事实上，归并排序的过程就可以看作是双指针，<br>两个列表逐一遍历，最后变成一个列表。但对于链表，这个过程并不简单，因为链表还有“连接”这一步。<br>我们先端上代码：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Definition for singly-linked list.</span><br><span class="hljs-comment"> * struct ListNode &#123;</span><br><span class="hljs-comment"> *     int val;</span><br><span class="hljs-comment"> *     ListNode *next;</span><br><span class="hljs-comment"> *     ListNode() : val(0), next(nullptr) &#123;&#125;</span><br><span class="hljs-comment"> *     ListNode(int x) : val(x), next(nullptr) &#123;&#125;</span><br><span class="hljs-comment"> *     ListNode(int x, ListNode *next) : val(x), next(next) &#123;&#125;</span><br><span class="hljs-comment"> * &#125;;</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">ListNode* <span class="hljs-title">merge</span><span class="hljs-params">(ListNode *left, ListNode *right)</span></span>&#123;<br>        ListNode *lptr = left;<br>        ListNode *rptr = right;<br>        ListNode *res = <span class="hljs-built_in">new</span>(ListNode);<br>        ListNode *head = res;<br>        <span class="hljs-keyword">while</span>(lptr &amp;&amp; rptr)&#123;<br>            ListNode *node = <span class="hljs-built_in">new</span>(ListNode);<br>            <span class="hljs-keyword">if</span>(lptr-&gt;val &lt; rptr-&gt;val)&#123;<br>                node-&gt;val = lptr-&gt;val;<br>                lptr = lptr-&gt;next;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                node-&gt;val = rptr-&gt;val;<br>                rptr = rptr-&gt;next;<br>            &#125;<br>            res-&gt;next = node;<br>            res = res-&gt;next;<br>        &#125;<br>        <span class="hljs-keyword">if</span>(lptr == <span class="hljs-literal">NULL</span> &amp;&amp; rptr != <span class="hljs-literal">NULL</span>)&#123;<br>            res-&gt;next = rptr;<br>        &#125;<br>        <span class="hljs-keyword">if</span>(lptr != <span class="hljs-literal">NULL</span> &amp;&amp; rptr == <span class="hljs-literal">NULL</span>)&#123;<br>            res-&gt;next = lptr;<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> head-&gt;next;<br>    &#125;<br>    <span class="hljs-function">ListNode* <span class="hljs-title">merge_sort</span><span class="hljs-params">(vector&lt;ListNode*&gt;&amp; lists, <span class="hljs-type">int</span> left, <span class="hljs-type">int</span> right)</span></span>&#123;<br>        <span class="hljs-keyword">if</span>(left &gt;= right)&#123;<br>            <span class="hljs-keyword">return</span> lists[left];<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">merge</span>(<span class="hljs-built_in">merge_sort</span>(lists, left, (left + right)/<span class="hljs-number">2</span>), <span class="hljs-built_in">merge_sort</span>(lists, (left + right)/<span class="hljs-number">2</span> + <span class="hljs-number">1</span>, right));<br>    &#125;<br>    <span class="hljs-function">ListNode* <span class="hljs-title">mergeKLists</span><span class="hljs-params">(vector&lt;ListNode*&gt;&amp; lists)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span>(lists.<span class="hljs-built_in">size</span>() == <span class="hljs-number">0</span>)&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        &#125;<br>        <span class="hljs-keyword">if</span>(lists.<span class="hljs-built_in">size</span>() == <span class="hljs-number">1</span>)&#123;<br>            <span class="hljs-keyword">return</span> lists[<span class="hljs-number">0</span>];<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">merge_sort</span>(lists, <span class="hljs-number">0</span>, lists.<span class="hljs-built_in">size</span>()<span class="hljs-number">-1</span>);<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure><p>先从merge的部分说起。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">ListNode* merge(ListNode *left, ListNode *right)&#123;<br>    ListNode *lptr = left;<br>    ListNode *rptr = right;<br>    ListNode *res = new(ListNode);<br>    ListNode *head = res;<br>    while(lptr &amp;&amp; rptr)&#123;<br>        ListNode *node = new(ListNode);<br>        if(lptr-&gt;val &lt; rptr-&gt;val)&#123;<br>            node-&gt;val = lptr-&gt;val;<br>            lptr = lptr-&gt;next;<br>        &#125;else&#123;<br>            node-&gt;val = rptr-&gt;val;<br>            rptr = rptr-&gt;next;<br>        &#125;<br>        res-&gt;next = node;<br>        res = res-&gt;next;<br>    &#125;<br>    if(lptr == NULL &amp;&amp; rptr != NULL)&#123;<br>        res-&gt;next = rptr;<br>    &#125;<br>    if(lptr != NULL &amp;&amp; rptr == NULL)&#123;<br>        res-&gt;next = lptr;<br>    &#125;<br><br>    return head-&gt;next;<br>&#125;<br></code></pre></td></tr></table></figure><p>这一步，我们将两个<strong>有序</strong>链表，以它们的头节点作为参数left、right传入了merge函数。</p><p>动用左右指针，逐个遍历，最后得到结果链表，并将这个链表返回。由于使用的是尾插，因此应该返回其头节点的下一节点。</p><p>注意：这个步骤在传入链表均为空链表时依旧是有效的。</p><p>再说说merge_sort这个函数。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">ListNode* merge_sort(vector&lt;ListNode*&gt;&amp; lists, int left, int right)&#123;<br>    if(left &gt;= right)&#123;<br>        return lists[left];<br>    &#125;<br><br>    return merge(merge_sort(lists, left, (left + right)/2), merge_sort(lists, (left + right)/2 + 1, right));<br></code></pre></td></tr></table></figure><p>这个函数接受3个参数，其中，lists是一个指针vector，用于存放所有链表的头节点。而left、right则是两个”指针”，这两个参数可以视作对<strong>这些</strong>链表进行切片操作。归并的第一步就是二分的过程，不断二分到left&#x3D;&#x3D;right时，返回lists[left]，如此一来，merge接受了两个头节点参数，合成了一个链表。这一个大链表作为返回值，<strong>是上一级merge_sort中，返回的merge函数的一个参数</strong>，不断向上“并”，实现了链表的合并。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;em&gt;该题是LeetCode的第23题&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&quot;题目描述&quot;&gt;&lt;a href=&quot;#题目描述&quot; class=&quot;headerlink&quot; title=&quot;题目描述&quot;&gt;&lt;/a&gt;题目描述&lt;/h2&gt;&lt;p&gt;给你一个链表数组，每个链表都已经按升序排列。&lt;/p&gt;
+&lt;p</summary>
+      
+    
+    
+    
+    <category term="Computer Science" scheme="http://alphazer01214.github.io/categories/Computer-Science/"/>
+    
+    
+    <category term="算法" scheme="http://alphazer01214.github.io/tags/%E7%AE%97%E6%B3%95/"/>
+    
+    <category term="C++" scheme="http://alphazer01214.github.io/tags/C/"/>
+    
+    <category term="递归分治" scheme="http://alphazer01214.github.io/tags/%E9%80%92%E5%BD%92%E5%88%86%E6%B2%BB/"/>
+    
+    <category term="LeetCode" scheme="http://alphazer01214.github.io/tags/LeetCode/"/>
+    
+  </entry>
+  
+  <entry>
     <title>算法学习笔记——Merge Sort</title>
     <link href="http://alphazer01214.github.io/2025/01/08/Merge-Sort/"/>
     <id>http://alphazer01214.github.io/2025/01/08/Merge-Sort/</id>
     <published>2025-01-08T15:20:36.000Z</published>
-    <updated>2025-01-12T17:57:52.658Z</updated>
+    <updated>2025-01-14T15:27:57.641Z</updated>
     
     <content type="html"><![CDATA[<h1 id="归并排序的主要思想"><a href="#归并排序的主要思想" class="headerlink" title="归并排序的主要思想"></a>归并排序的主要思想</h1><p><strong>归</strong>——将数组分成两部分，分别进行排序。<br><strong>并</strong>——将已经排序的两个数组合并起来。</p><p>“并”的部分对于我而言有点难以理解，接下来的重点会放在“并”上面。</p><h1 id="代码实现——步骤一"><a href="#代码实现——步骤一" class="headerlink" title="代码实现——步骤一"></a>代码实现——步骤一</h1><p>第一步就是使用递归将数组二分，关键在于利用下标实现二分操作。</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">merge_sort</span><span class="hljs-params">(<span class="hljs-type">int</span> arr[], <span class="hljs-type">int</span> left, <span class="hljs-type">int</span> right)</span>&#123;<br>    <span class="hljs-comment">// left right are index</span><br>    <span class="hljs-keyword">if</span>(left &gt;= right)&#123;<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-type">int</span> mid = (right+left)/<span class="hljs-number">2</span>;<br>        merge_sort(arr, left, mid);<br>        merge_sort(arr, mid+<span class="hljs-number">1</span>, right);<br>        msort(arr, left, right, mid);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure><h2 id="代码解释"><a href="#代码解释" class="headerlink" title="代码解释"></a>代码解释</h2><p>递归需要终止条件，当长度为1，利用下标表示就是left&gt;&#x3D;right，此时递归结束，返回上一级。<br>接着将二分的索引作为参数（就是新二分出来数组的left，right），进行递归操作，实现原数组的对半分。<br>分割操作之后是msort，稍后讲解。<br>注意：<strong>整个过程中arr本身的长度都是不变的</strong>！而且arr的索引还是从0开始到结束，也就是说，我们并不是真的将数组分割成了一个一个新数组，<strong>我们都是在原数组上进行操作</strong>，我们所有操作都是通过下标实现的。</p><h1 id="代码实现——步骤二"><a href="#代码实现——步骤二" class="headerlink" title="代码实现——步骤二"></a>代码实现——步骤二</h1><p>对于一次并，示意图如下：<br><img src="/../_images/mergesort.png" alt="归并示意图"></p><ol><li>我们假设有两个<strong>已排序</strong>的数组（假设已排序，这样就能先解决将两数组合并的问题）</li><li>这两个数组被拼成了一个数组，下标如图所示</li><li>对这么一个数组进行排序，只需要一次遍历操作<br>我们引入两个类似指针的变量<strong>i, j</strong>，一个指向这个数组的开头，一个指向中间，那么我们就能通过比较<strong>i, j</strong>索引对应的值来进行排序。<br>如果只有这一个数组，排序有些困难，于是我们选择引入新的数组（即复制一遍原数组），然后<strong>把排序结果保存回原数组</strong>。<br>注意：我们这里加入了<strong>left、right、mid</strong>变量来获取这个数组的开头、结尾与中间，其中这三个变量都是索引值。</li></ol><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> tmp_arr[right];<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = left; i &lt;= right; i++)&#123;<br>    <span class="hljs-comment">// copy to a temp arr</span><br>    tmp_arr[i] = arr[i];<br>&#125;<br><span class="hljs-type">int</span> i = left, j = mid+<span class="hljs-number">1</span>;<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k = left; k &lt;= right; k++)&#123;<br>    <span class="hljs-keyword">if</span>(i &gt; mid)&#123;<br>        arr[k] = tmp_arr[j++];<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<span class="hljs-keyword">else</span><br>    <span class="hljs-keyword">if</span>(j &gt; right)&#123;<br>        arr[k] = tmp_arr[i++];<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br>    <span class="hljs-keyword">if</span>(tmp_arr[i] &lt; tmp_arr[j])&#123;<br>        arr[k] = tmp_arr[i++];<br>    &#125;<span class="hljs-keyword">else</span><br>    <span class="hljs-keyword">if</span>(tmp_arr[i] &gt;= tmp_arr[j])&#123;<br>        arr[k] = tmp_arr[j++];<br>    &#125;<br>&#125;<br>        <br></code></pre></td></tr></table></figure><h2 id="代码解释-1"><a href="#代码解释-1" class="headerlink" title="代码解释"></a>代码解释</h2><p>在自行实现归并排序的过程中，最纠结的就是如何规定数组的长度，但实际上长度并不重要，因为最后都可以按照其索引值将结果复制回原数组。<br>在分成单个数组时，回到了上一步两个数组的状态，而这两个数组长度一定小于等于2，由于msort的过程中一次只能处理一个数组，因此实际上，msort是先分别排序了这两个数组，它们混合进了arr[]，然后再进入msort进行排序。</p><h1 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h1><p>在面对元素较少的数组时，可以考虑其它排序方法。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>其实我认为“将数组分割再合并”的说法非常令人费解，因为这样就会让人有“把两个数组传进一个函数，这个函数去把这两个数组首尾相接拼起来”的感觉，这种操作如何用递归实现？我还没有探索过。</p><p>实际上可以理解成，含n个元素的一个数组arr，我们先是有n个指针指着各个元素，然后两个两个比较大小&#x2F;对调元素，接下来指针减半（两个指针之间间隔一个位置），然后4个一组，每组有两个指针，进行比大小与对换元素的操作，然后指针再减半，以此类推</p>]]></content>
     
@@ -36,7 +212,7 @@
     <category term="Computer Science" scheme="http://alphazer01214.github.io/categories/Computer-Science/"/>
     
     
-    <category term="Algorithms" scheme="http://alphazer01214.github.io/tags/Algorithms/"/>
+    <category term="算法" scheme="http://alphazer01214.github.io/tags/%E7%AE%97%E6%B3%95/"/>
     
   </entry>
   
