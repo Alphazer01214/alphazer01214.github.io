@@ -6,7 +6,7 @@
   <link href="http://alphazer01214.github.io/atom.xml" rel="self"/>
   
   <link href="http://alphazer01214.github.io/"/>
-  <updated>2025-01-22T05:25:01.172Z</updated>
+  <updated>2025-02-02T14:40:18.461Z</updated>
   <id>http://alphazer01214.github.io/</id>
   
   <author>
@@ -15,6 +15,56 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Transformer</title>
+    <link href="http://alphazer01214.github.io/2025/02/02/Transformer/"/>
+    <id>http://alphazer01214.github.io/2025/02/02/Transformer/</id>
+    <published>2025-02-02T14:38:57.000Z</published>
+    <updated>2025-02-02T14:40:18.461Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Transformer-的基本架构"><a href="#Transformer-的基本架构" class="headerlink" title="Transformer 的基本架构"></a>Transformer 的基本架构</h1>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;Transformer-的基本架构&quot;&gt;&lt;a href=&quot;#Transformer-的基本架构&quot; class=&quot;headerlink&quot; title=&quot;Transformer 的基本架构&quot;&gt;&lt;/a&gt;Transformer 的基本架构&lt;/h1&gt;</summary>
+      
+    
+    
+    
+    <category term="Artificial Intelligence" scheme="http://alphazer01214.github.io/categories/Artificial-Intelligence/"/>
+    
+    
+    <category term="注意力机制" scheme="http://alphazer01214.github.io/tags/%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Deepseek论文学习</title>
+    <link href="http://alphazer01214.github.io/2025/01/27/Deepseek%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/"/>
+    <id>http://alphazer01214.github.io/2025/01/27/Deepseek%E8%AE%BA%E6%96%87%E5%AD%A6%E4%B9%A0/</id>
+    <published>2025-01-27T15:54:05.000Z</published>
+    <updated>2025-01-29T21:46:30.054Z</updated>
+    
+    <content type="html"><![CDATA[<p>DeepSeek</p><p>本文不严格按照论文顺序，本文有太多未了解的内容，我需要针对这些概念进一步学习。</p><h2 id="Introduction-部分"><a href="#Introduction-部分" class="headerlink" title="Introduction 部分"></a>Introduction 部分</h2><p>Post Training在训练过程起重要作用，能够提高推理任务的准确性。相对pre-training，其需要计算资源更少。</p><blockquote><p><strong>Post-training</strong>：训练后处理，是指在模型完成主要训练后，为进一步提升性能或适应特定需求而进行的一系列优化和调整步骤。这些步骤通常包括模型压缩、微调、量化和蒸馏等技术。</p><p>通过该过程，模型可以自主探索一个复杂问题的思维链。</p><p>实现方式：</p><ol><li><strong>模型压缩</strong>：<ul><li><strong>剪枝（Pruning）</strong>：移除不重要的神经元或权重，减少模型复杂度。</li><li><strong>量化（Quantization）</strong>：将浮点数权重转换为低精度表示，如8位整数，以提升推理速度并减少内存占用。</li></ul></li><li><strong>微调（Fine-tuning）</strong>：<ul><li><strong>领域适应（Domain Adaptation）</strong>：在特定领域数据上进一步训练，以提高在该领域的表现。</li><li><strong>任务特定微调（Task-specific Fine-tuning）</strong>：针对特定任务调整模型参数。</li></ul></li><li><strong>知识蒸馏（Knowledge Distillation）</strong>：<ul><li>使用大模型（教师模型）指导小模型（学生模型）训练，以在保持性能的同时减少模型大小和计算需求。</li></ul></li><li><strong>模型优化</strong>：<ul><li><strong>硬件优化</strong>：针对特定硬件（如GPU、TPU）优化模型，提升推理效率。</li><li><strong>软件优化</strong>：使用高效推理框架（如TensorRT、ONNX Runtime）加速模型推理。</li></ul></li></ol></blockquote><p>对于推理能力，OpenAI的o1使用<strong>推理时缩放</strong>，通过加长思维链实现推理过程。但这一缩放过程的有效性是一大挑战。尽管有其它方法诸如过程奖励、强化学习、开发类似<strong>Monte Carlo Tree Search</strong>，<strong>Beam Search</strong>等算法，但都无法达到o1的水平。</p><p>而DeepSeek R1使用纯粹的<strong>强化学习</strong>，而不使用任何监督数据。基于V3的<strong>GRPO</strong>作为强化学习的框架，R1表现了强大的推理能力。</p><blockquote><p><strong>GRPO</strong>：Group Relative Policy Optimization，DeepSeek V3使用的策略优化方法，对应V3报告中5.2.2部分。</p><p>对于一个问题q，GRPO在旧的<strong>策略模型</strong>$\pi_{\theta old}$输出中采样一组数据，并进行优化。具体公式 见报告。</p></blockquote><p>但DeepSeek存在问题：可读性差、语言混杂。解决该问题的方法是，将一些<strong>冷启动数据</strong>（即对于模型而言是“新的”数据，以前没有品鉴过）提供给V3模型，进行以推理为中心的强化学习，在找到局部最优解时，再从强化学习检查点的<strong>拒绝采样</strong>，结合V3在各个领域内的监督数据，创造新的微调数据，进行重复训练。如此一来，该检查点就经历了额外的强化学习步骤，进而实现对各个情景下prompt的考虑。</p><p>DeepSeek的”思考——解答“模式有一些有趣的特性。对于显式的思考过程，比如在解数学题时，可能会有”灵光一现”，即找到了其它更好的思考方式，并重新沿着这种思考方式前进，进而找到正解。</p><h2 id="Approach-部分"><a href="#Approach-部分" class="headerlink" title="Approach 部分"></a>Approach 部分</h2><p>相较于以往的模型使用大规模的监督数据提高性能，DeepSeek更注重提高模型的自主思考能力（推理能力）。而推理能力可以通过大规模的强化学习提高，甚至不需要冷启动数据。当然，冷启动数据能够更好地训练模型。</p><h3 id="强化学习算法"><a href="#强化学习算法" class="headerlink" title="强化学习算法"></a>强化学习算法</h3><h4 id="GRPO"><a href="#GRPO" class="headerlink" title="GRPO"></a>GRPO</h4><p>此算法旨在减少训练的开支，分为以下步骤。</p><h5 id="优势值计算"><a href="#优势值计算" class="headerlink" title="优势值计算"></a>优势值计算</h5><p>第$i$个样本的优势值$A_i$，由样本奖励值$r_i$，以及平均值（基线）$b$决定：<br>$$<br>A_i &#x3D; r_i-b \<br>b &#x3D; \frac{1}{N}\sum_{i&#x3D;1}^{N}r_i<br>$$</p><h5 id="策略优化函数"><a href="#策略优化函数" class="headerlink" title="策略优化函数"></a>策略优化函数</h5><p>$$<br>L(\theta)&#x3D;E[min(\frac{\pi_{\theta}(a|s)}{\pi_{\theta_{old}}(a|s)}A_i, clip(\frac{\pi_{\theta}(a|s)}{\pi_{\theta_{old}}(a|s)}, 1-ϵ,1+ϵ)A_i)]<br>$$</p><p>其中，</p><p><strong>概率比</strong>：<br>$$<br>\frac{\pi_{\theta}(a|s)}{\pi_{\theta_{old}}(a|s)}<br>$$<br>$s$表示状态，$a$表示动作，$a|s$即条件概率。$\pi_\theta$表示策略，因此$\pi_\theta(a|s)$表示在某个策略下，对于状态s，执行操作a的概率。对于新旧策略，执行该操作的概率有所变化，即体现了新旧策略在动作选择上的差异。</p><p><strong>等待更深入学习</strong></p><h4 id="奖励建模-Reward-Modelling"><a href="#奖励建模-Reward-Modelling" class="headerlink" title="奖励建模(Reward Modelling)"></a>奖励建模(Reward Modelling)</h4><blockquote><p>在强化学习中，<strong>Reward Modelling（奖励建模）</strong> 是指通过设计或学习一个奖励函数，以准确反映智能体在环境中应追求的目标的过程。它是强化学习系统的核心组成部分，因为奖励函数直接决定了智能体的行为优化方向。(DeepSeek)</p></blockquote><p>“奖励”来源于训练的源。其来源于两方面：</p><ol><li><strong>准确度奖励</strong>，即对于有正解的问题，其输出是否与答案匹配</li><li><strong>格式奖励</strong>，即让模型将深度思考的内容列于标签 <code>&lt;think&gt;</code>之间</li></ol><p>DeepSeek没有使用<strong>神经奖励模型</strong>。(<strong>待补充</strong>)在大规模强化学习中，可能会导致reward hacking，且需要额外的训练资源。</p><h3 id="DeepSeek-R1的构建"><a href="#DeepSeek-R1的构建" class="headerlink" title="DeepSeek R1的构建"></a>DeepSeek R1的构建</h3><h4 id="冷启动"><a href="#冷启动" class="headerlink" title="冷启动"></a>冷启动</h4><h4 id="模型蒸馏"><a href="#模型蒸馏" class="headerlink" title="模型蒸馏"></a>模型蒸馏</h4><p>蒸馏模型，即将一个庞大的模型压缩到一个较小的规模。模型蒸馏的实质是<strong>知识蒸馏</strong>，即大模型的架构优势是无法直接继承给蒸馏模型的，类比教师和学生的关系，<strong>教师模型</strong>将”知识”传授给<strong>学生模型</strong>。</p><p>神经网络就是一个黑箱，因此理解其内涵就应该以一种更抽象的思维。例如，一个词向量有着上百个维度，某些维度的数据用来存储词性，某些用来存储发音，甚至有些存储了我们不能理解的特征。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;DeepSeek&lt;/p&gt;
+&lt;p&gt;本文不严格按照论文顺序，本文有太多未了解的内容，我需要针对这些概念进一步学习。&lt;/p&gt;
+&lt;h2 id=&quot;Introduction-部分&quot;&gt;&lt;a href=&quot;#Introduction-部分&quot; class=&quot;headerlink&quot; title=</summary>
+      
+    
+    
+    
+    <category term="Artificial Intelligence" scheme="http://alphazer01214.github.io/categories/Artificial-Intelligence/"/>
+    
+    
+    <category term="论文" scheme="http://alphazer01214.github.io/tags/%E8%AE%BA%E6%96%87/"/>
+    
+  </entry>
   
   <entry>
     <title>算法学习笔记——动态规划与字符串</title>
