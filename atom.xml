@@ -43,19 +43,18 @@
     <link href="http://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/"/>
     <id>http://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/</id>
     <published>2025-01-14T15:29:32.000Z</published>
-    <updated>2025-04-02T09:50:58.970Z</updated>
+    <updated>2025-04-02T10:17:15.566Z</updated>
     
-    <content type="html"><![CDATA[<p>It’s actually a test.</p><p>试试加入图片。</p><p><img src="/1.jpg"></p><p><img src="/2.jpg"></p><p><img src="/3.jpg"></p><p>虽然专辑到手了，但光驱还差个电源线（悲）</p><p>试了好几次终于是能显示图片了，图片资源放在img文件夹中，还不知道要怎么实现单独给post开个资源文件夹，img文件夹的资源是网站共享的，而且在Typora编辑的时候没办法看到图片（悲）</p>]]></content>
+    <content type="html"><![CDATA[<p>It’s actually a test.</p><p>试试加入图片。</p><p><img src="/images/1.jpg"></p><p><img src="/images/2.jpg"></p><p><img src="/images/3.jpg"></p><p>虽然专辑到手了，但光驱还差个电源线（悲）</p><p>试了好几次终于是能显示图片了，图片资源放在img文件夹中，还不知道要怎么实现单独给post开个资源文件夹，img文件夹的资源是网站共享的，而且在Typora编辑的时候没办法看到图片（悲）</p>]]></content>
     
     
       
       
     <summary type="html">&lt;p&gt;It’s actually a test.&lt;/p&gt;
 &lt;p&gt;试试加入图片。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/1.jpg&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/2.jpg&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/3.jpg&quot;&gt;&lt;/p&gt;
-&lt;p&gt;虽然专辑到手了，但光驱还差个电</summary>
+&lt;p&gt;&lt;img src=&quot;/images/1.jpg&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2.jpg&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/3.jpg&quot;&gt;&lt;/</summary>
       
     
     
