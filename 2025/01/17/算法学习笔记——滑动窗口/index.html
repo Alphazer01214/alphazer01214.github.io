@@ -1,0 +1,231 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>算法学习笔记——滑动窗口 | Alphazer01214’s Blog</title><meta name="author" content="Alpha_零能"><meta name="copyright" content="Alpha_零能"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="题目描述给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。 返回 滑动窗口中的最大值 。 思路考虑利用一个单调的双端队列（deque）实现对区间最大值的维护。这个deque的前端就是这个区间的最大值，而其后续的部分则是接下来的窗口中有可能取到的最大值。 再考虑一个双指针，中间的部分即为窗口。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法学习笔记——滑动窗口">
+<meta property="og:url" content="http://alphazer01214.github.io/2025/01/17/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/index.html">
+<meta property="og:site_name" content="Alphazer01214’s Blog">
+<meta property="og:description" content="题目描述给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。 返回 滑动窗口中的最大值 。 思路考虑利用一个单调的双端队列（deque）实现对区间最大值的维护。这个deque的前端就是这个区间的最大值，而其后续的部分则是接下来的窗口中有可能取到的最大值。 再考虑一个双指针，中间的部分即为窗口。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://alphazer01214.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-17T09:40:08.000Z">
+<meta property="article:modified_time" content="2025-01-17T10:46:34.646Z">
+<meta property="article:author" content="Alpha_零能">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="队列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://alphazer01214.github.io/img/avatar.jpg"><link rel="shortcut icon" href="/img/avatar.jpg"><link rel="canonical" href="http://alphazer01214.github.io/2025/01/17/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?13749296cb241d17e3126c6062c91c75";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+btf.addGlobalFn('pjaxComplete', () => {
+  _hmt.push(['_trackPageview',window.location.pathname])
+}, 'baidu_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '算法学习笔记——滑动窗口',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  isShuoshuo: false
+}</script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Alphazer01214’s Blog" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw music list"></i><span> 歌单</span></a></li><li><a class="site-page child" href="/anime/"><i class="fa-fw anime list"></i><span> 番剧</span></a></li><li><a class="site-page child" href="/galgames/"><i class="fa-fw galgame list"></i><span> Galgame</span></a></li><li><a class="site-page child" href="/books/"><span> 书单</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/bg2.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Alphazer01214’s Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">算法学习笔记——滑动窗口</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw music list"></i><span> 歌单</span></a></li><li><a class="site-page child" href="/anime/"><i class="fa-fw anime list"></i><span> 番剧</span></a></li><li><a class="site-page child" href="/galgames/"><i class="fa-fw galgame list"></i><span> Galgame</span></a></li><li><a class="site-page child" href="/books/"><span> 书单</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">算法学习笔记——滑动窗口</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-17T09:40:08.000Z" title="发表于 2025-01-17 17:40:08">2025-01-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-17T10:46:34.646Z" title="更新于 2025-01-17 18:46:34">2025-01-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer-Science/">Computer Science</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">793</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><p>给你一个整数数组 <code>nums</code>，有一个大小为 <code>k</code> 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 <code>k</code> 个数字。滑动窗口每次只向右移动一位。</p>
+<p>返回 <em>滑动窗口中的最大值</em> 。</p>
+<h1 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h1><p>考虑利用一个<strong>单调的</strong>双端队列（deque）实现对区间最大值的维护。这个deque的前端就是这个区间的最大值，而其后续的部分则是接下来的窗口中有可能取到的最大值。</p>
+<p>再考虑一个双指针，中间的部分即为窗口。我们只需要考虑left和right的元素即可。</p>
+<p>例如：</p>
+<blockquote>
+<p>输入：nums &#x3D; [1,3,-1,-3,5,3,6,7], k &#x3D; 3</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">滑动窗口的位置                最大值             deque</span><br><span class="line">---------------               -----          --------</span><br><span class="line">[1  3  -1] -3  5  3  6  7       3             3, -1</span><br><span class="line"> 1 [3  -1  -3] 5  3  6  7       3             3, -1, -3</span><br><span class="line"> 1  3 [-1  -3  5] 3  6  7       5             5</span><br><span class="line"> 1  3  -1 [-3  5  3] 6  7       5             5, 3</span><br><span class="line"> 1  3  -1  -3 [5  3  6] 7       6             6</span><br><span class="line"> 1  3  -1  -3  5 [3  6  7]      7             7</span><br></pre></td></tr></table></figure>
+
+<p>对于最开始的3个，最大值是3，然而在窗口向右移动时，若3弹出，-1有可能成为某个区间的最大值，因此在deque中保留了-1.</p>
+<p>当5进入，它比deque中任何一个元素都大（只要它比deque front大），所以deque全部pop，并加入5.</p>
+<p>如果进入的某个元素不大于deque front，却大于deque back，那么deque中比这个元素小的数在今后的区间内就不会成为最大值了，因此将其全部pop。</p>
+<p>然而在实现的过程中，最令我困惑的是，窗口左端何时出，右端何时入。</p>
+<p>声明需要的变量。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">deque&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">vector&lt;<span class="type">int</span>&gt; res;</span><br><span class="line"><span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> len = nums.<span class="built_in">size</span>();</span><br></pre></td></tr></table></figure>
+
+<p>首先解决前k个的问题。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(right &lt; k)&#123;</span><br><span class="line">    <span class="keyword">if</span>(nums[right] &gt; q.<span class="built_in">front</span>())&#123;</span><br><span class="line">        <span class="keyword">while</span>(!q.<span class="built_in">empty</span>())&#123;</span><br><span class="line">            q.<span class="built_in">pop_back</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        q.<span class="built_in">push_front</span>(nums[right]);</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">while</span>(!q.<span class="built_in">empty</span>() &amp;&amp; nums[right] &gt; q.<span class="built_in">back</span>())&#123;</span><br><span class="line">            q.<span class="built_in">pop_back</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        q.<span class="built_in">push_back</span>(nums[right]);</span><br><span class="line">    &#125;</span><br><span class="line">    right++;</span><br><span class="line">&#125;</span><br><span class="line">res.<span class="built_in">push_back</span>(q.<span class="built_in">front</span>());</span><br></pre></td></tr></table></figure>
+
+<p>再看其余的。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(right &lt; len)&#123;</span><br><span class="line">    <span class="keyword">if</span>(nums[left] == q.<span class="built_in">front</span>())&#123;</span><br><span class="line">        q.<span class="built_in">pop_front</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(nums[right] &gt; q.<span class="built_in">front</span>())&#123;</span><br><span class="line">        <span class="keyword">while</span>(!q.<span class="built_in">empty</span>())&#123;</span><br><span class="line">            q.<span class="built_in">pop_front</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        q.<span class="built_in">push_front</span>(nums[right]);</span><br><span class="line">    &#125;<span class="keyword">else</span> </span><br><span class="line">    <span class="keyword">if</span>(nums[right] &lt;= q.<span class="built_in">front</span>())&#123;</span><br><span class="line">        <span class="keyword">while</span>(!q.<span class="built_in">empty</span>() &amp;&amp; q.<span class="built_in">back</span>() &lt; nums[right])&#123;</span><br><span class="line">            q.<span class="built_in">pop_back</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        q.<span class="built_in">push_back</span>(nums[right]);</span><br><span class="line">    &#125;</span><br><span class="line">    right++;</span><br><span class="line">    left++;</span><br><span class="line">    res.<span class="built_in">push_back</span>(q.<span class="built_in">front</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事实上，我们需要使此后的区间长度为k+1，因为需要判断front是否需要弹出。</p>
+<h1 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">maxSlidingWindow</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums, <span class="type">int</span> k)</span> </span>&#123;</span><br><span class="line">        deque&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">        vector&lt;<span class="type">int</span>&gt; res;</span><br><span class="line">        <span class="type">int</span> left = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> right = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> len = nums.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">while</span>(right &lt; k)&#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[right] &gt; q.<span class="built_in">front</span>())&#123;</span><br><span class="line">                <span class="keyword">while</span>(!q.<span class="built_in">empty</span>())&#123;</span><br><span class="line">                    q.<span class="built_in">pop_back</span>();</span><br><span class="line">                &#125;</span><br><span class="line">                q.<span class="built_in">push_front</span>(nums[right]);</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">while</span>(!q.<span class="built_in">empty</span>() &amp;&amp; nums[right] &gt; q.<span class="built_in">back</span>())&#123;</span><br><span class="line">                    q.<span class="built_in">pop_back</span>();</span><br><span class="line">                &#125;</span><br><span class="line">                q.<span class="built_in">push_back</span>(nums[right]);</span><br><span class="line">            &#125;</span><br><span class="line">            right++;</span><br><span class="line">        &#125;</span><br><span class="line">        res.<span class="built_in">push_back</span>(q.<span class="built_in">front</span>());</span><br><span class="line">        <span class="keyword">while</span>(right &lt; len)&#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[left] == q.<span class="built_in">front</span>())&#123;</span><br><span class="line">                q.<span class="built_in">pop_front</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(nums[right] &gt; q.<span class="built_in">front</span>())&#123;</span><br><span class="line">                <span class="keyword">while</span>(!q.<span class="built_in">empty</span>())&#123;</span><br><span class="line">                    q.<span class="built_in">pop_front</span>();</span><br><span class="line">                &#125;</span><br><span class="line">                q.<span class="built_in">push_front</span>(nums[right]);</span><br><span class="line">            &#125;<span class="keyword">else</span> </span><br><span class="line">            <span class="keyword">if</span>(nums[right] &lt;= q.<span class="built_in">front</span>())&#123;</span><br><span class="line">                <span class="keyword">while</span>(!q.<span class="built_in">empty</span>() &amp;&amp; q.<span class="built_in">back</span>() &lt; nums[right])&#123;</span><br><span class="line">                    q.<span class="built_in">pop_back</span>();</span><br><span class="line">                &#125;</span><br><span class="line">                q.<span class="built_in">push_back</span>(nums[right]);</span><br><span class="line">            &#125;</span><br><span class="line">            right++;</span><br><span class="line">            left++;</span><br><span class="line">            res.<span class="built_in">push_back</span>(q.<span class="built_in">front</span>());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://alphazer01214.github.io">Alpha_零能</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://alphazer01214.github.io/2025/01/17/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/">http://alphazer01214.github.io/2025/01/17/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://alphazer01214.github.io" target="_blank">Alphazer01214’s Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%AE%97%E6%B3%95/">算法</a><a class="post-meta__tags" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a><a class="post-meta__tags" href="/tags/%E9%98%9F%E5%88%97/">队列</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/01/20/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E7%94%9F%E6%88%90%E6%90%9C%E7%B4%A2%E4%BA%8C%E5%8F%89%E6%A0%91/" title="算法学习笔记——生成搜索二叉树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">算法学习笔记——生成搜索二叉树</div></div><div class="info-2"><div class="info-item-1">这是LeetCode第95、96题 不同二叉搜索树的种类首先是研究二叉搜索树的数量性质：  给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。  二叉搜索树，指对于根节点，左子树所有元素均小于该节点，右子树所有节点都大于这个节点。 例如，当n&#x3D;1，显然只有一种情况。而当n&#x3D;2，就有2种情况，这是因为1、2都可以作为根节点，产生2个不同的树。 特别地，当n&#x3D;0也是一种情况，我们把NULL也看作一棵树。 接下来考虑n&#x3D;3，它的根节点可以是1、2、3。从二叉搜索树性质出发：  当根节点为1，它不会有左子树，而右子树有两个节点。 当根节点为2，它一定有左右子树，而且各有一个节点。 当根节点为3，情况与1类似。  这样，就找到了一个子问题。例如，当根节点为1，它的子问题就是：没有节点的二叉搜索树有几种情况，有2个节点的二叉搜索树有几种情况。 推广到一般情况并以此列出方程：$$dp[i] &#x3D;...</div></div></div></a><a class="pagination-related" href="/2025/01/15/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%A0%86%E3%80%81%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/" title="算法学习笔记——堆、优先队列"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">算法学习笔记——堆、优先队列</div></div><div class="info-2"><div class="info-item-1">这个页面等待填充。 https://leetcode.cn/problems/maximum-number-of-eaten-apples/description/ https://leetcode.cn/problems/design-task-manager/description/ 股票买卖问题：若可同时持有多支股票，那么如何决策获得收益最大？ </div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/01/15/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%A0%86%E3%80%81%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/" title="算法学习笔记——堆、优先队列"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-15</div><div class="info-item-2">算法学习笔记——堆、优先队列</div></div><div class="info-2"><div class="info-item-1">这个页面等待填充。 https://leetcode.cn/problems/maximum-number-of-eaten-apples/description/ https://leetcode.cn/problems/design-task-manager/description/ 股票买卖问题：若可同时持有多支股票，那么如何决策获得收益最大？ </div></div></div></a><a class="pagination-related" href="/2025/01/15/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%9B%BE%E7%9A%84%E8%AE%B0%E5%BF%86%E5%8C%96%E9%81%8D%E5%8E%86/" title="算法学习笔记——图的记忆化遍历"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-15</div><div class="info-item-2">算法学习笔记——图的记忆化遍历</div></div><div class="info-2"><div class="info-item-1">这个页面待填充。 [ABC351D] Grid and Magnet题面翻译有一个用字符类型表示的 $H$ 行 $W$ 列的地图 $S$，如果 $S_{i,j}$ 是字符 . 则代表这一格是空地，如果是 # 则代表这一格上有一个磁铁。现有一个小人从一个格子上出发，每次可以到达与之相邻（上、下、左、右）的四个格子，但如果有一个磁铁与之相邻（上下左右的四个格子中至少有一个磁铁）他就不能动了。求小人从某一格出发，经过任意多次运动，可以到达的格子的最大数量。 输入格式入力は以下の形式で標準入力から与えられる。  $ H $ $ W $ $ S_1 $ $ S_2 $ $ \vdots $ $ S_H $  输出格式マス目のうち磁石が置かれていないマスの中における、マスの自由度の最大値を出力せよ。 样例输入 #112343 5.#.........#..#  样例输出 #119  样例输入 #212343 3..##....#  样例输出 #211  制約 $ 1\leq\ H,W\leq\ 1000 $ $ H,W $ は整数 $ S_i $ は . と # のみからなる長さ $ W...</div></div></div></a><a class="pagination-related" href="/2025/01/20/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E7%94%9F%E6%88%90%E6%90%9C%E7%B4%A2%E4%BA%8C%E5%8F%89%E6%A0%91/" title="算法学习笔记——生成搜索二叉树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-20</div><div class="info-item-2">算法学习笔记——生成搜索二叉树</div></div><div class="info-2"><div class="info-item-1">这是LeetCode第95、96题 不同二叉搜索树的种类首先是研究二叉搜索树的数量性质：  给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。  二叉搜索树，指对于根节点，左子树所有元素均小于该节点，右子树所有节点都大于这个节点。 例如，当n&#x3D;1，显然只有一种情况。而当n&#x3D;2，就有2种情况，这是因为1、2都可以作为根节点，产生2个不同的树。 特别地，当n&#x3D;0也是一种情况，我们把NULL也看作一棵树。 接下来考虑n&#x3D;3，它的根节点可以是1、2、3。从二叉搜索树性质出发：  当根节点为1，它不会有左子树，而右子树有两个节点。 当根节点为2，它一定有左右子树，而且各有一个节点。 当根节点为3，情况与1类似。  这样，就找到了一个子问题。例如，当根节点为1，它的子问题就是：没有节点的二叉搜索树有几种情况，有2个节点的二叉搜索树有几种情况。 推广到一般情况并以此列出方程：$$dp[i] &#x3D;...</div></div></div></a><a class="pagination-related" href="/2025/01/22/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2/" title="算法学习笔记——动态规划与字符串"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-22</div><div class="info-item-2">算法学习笔记——动态规划与字符串</div></div><div class="info-2"><div class="info-item-1">摘要字符串，包括其排列组合，以及匹配算法，与动态规划密切相关。这篇文章总结一些字符串匹配算法，并解决一些字符串相关动态规划问题。 题目一：扰乱字符串该题涉及区间DP、子字符串表示等。 题面 使用下面描述的算法可以扰乱字符串 s 得到字符串 t ：  如果字符串的长度为 1 ，算法停止 如果字符串的长度 &gt; 1 ，执行下述步骤： 在一个随机下标处将字符串分割成两个非空的子字符串。即，如果已知字符串 s ，则可以将其分成两个子字符串 x 和 y ，且满足 s = x + y 。 随机 决定是要「交换两个子字符串」还是要「保持这两个子字符串的顺序不变」。即，在执行这一步骤之后，s 可能是 s = x + y 或者 s = y + x 。 在 x 和 y 这两个子字符串上继续从步骤 1 开始递归执行此算法。    给你两个 长度相等 的字符串 s1 和 s2，判断 s2 是否是 s1 的扰乱字符串。如果是，返回 true ；否则，返回 false 。  示例 1： 1234567891011输入：s1 = &quot;great&quot;, s2 =...</div></div></div></a><a class="pagination-related" href="/2025/01/21/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E4%B8%8E%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/" title="算法学习笔记——动态规划与背包问题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-21</div><div class="info-item-2">算法学习笔记——动态规划与背包问题</div></div><div class="info-2"><div class="info-item-1">题目一：前缀和、动态规划这是LeetCode第2218题，今天的每日一题。 题面 一张桌子上总共有 n 个硬币 栈 。每个栈有 正整数 个带面值的硬币。 每一次操作中，你可以从任意一个栈的 顶部 取出 1 个硬币，从栈中移除它，并放入你的钱包里。 给你一个列表 piles ，其中 piles[i] 是一个整数数组，分别表示第 i 个栈里 从顶到底 的硬币面值。同时给你一个正整数 k ，请你返回在 恰好 进行 k 次操作的前提下，你钱包里硬币面值之和 最大为多少 。  示例 1：  12输入：piles = [[1,100,3],[7,8,9]], k =...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Alpha_零能</div><div class="author-info-description">实用主义 | 兴趣使然</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/alphazer01214"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/alphazer01214" target="_blank" title="Alphazer01214's github"><i class="fa-brands fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:alphazer01214@gmail.com" target="_blank" title="Alphazer011214's email"><i class="fa-solid fa-square-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/9879205" target="_blank" title="Alpha_零能 Bilibili主页"><i class="fa-brands fa-bilibili" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Welcome to my blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">完整代码</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/05/12/CppSynthesizer/" title="CppSynthesizer">CppSynthesizer</a><time datetime="2025-05-12T12:15:54.000Z" title="发表于 2025-05-12 20:15:54">2025-05-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/22/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E4%B8%8E%E5%AD%97%E7%AC%A6%E4%B8%B2/" title="算法学习笔记——动态规划与字符串">算法学习笔记——动态规划与字符串</a><time datetime="2025-01-21T19:55:09.000Z" title="发表于 2025-01-22 03:55:09">2025-01-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/21/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E4%B8%8E%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/" title="算法学习笔记——动态规划与背包问题">算法学习笔记——动态规划与背包问题</a><time datetime="2025-01-21T10:49:56.000Z" title="发表于 2025-01-21 18:49:56">2025-01-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/20/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E7%94%9F%E6%88%90%E6%90%9C%E7%B4%A2%E4%BA%8C%E5%8F%89%E6%A0%91/" title="算法学习笔记——生成搜索二叉树">算法学习笔记——生成搜索二叉树</a><time datetime="2025-01-20T07:29:14.000Z" title="发表于 2025-01-20 15:29:14">2025-01-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/17/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/" title="算法学习笔记——滑动窗口">算法学习笔记——滑动窗口</a><time datetime="2025-01-17T09:40:08.000Z" title="发表于 2025-01-17 17:40:08">2025-01-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2025 By Alpha_零能</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+      
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
