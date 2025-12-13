@@ -1,3 +1,5 @@
+https://alphazer01214.github.io/2025/12/06/OpenCV%E9%85%8D%E7%BD%AE%E8%B8%A9%E5%9D%91%E8%B8%A9%E9%BA%BB%E4%BA%86/
+https://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/
 https://alphazer01214.github.io/galgames/2025.html
 https://alphazer01214.github.io/galgames/index.html
 https://alphazer01214.github.io/2025/10/14/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E4%BD%8D%E8%BF%90%E7%AE%97/
@@ -10,7 +12,6 @@ https://alphazer01214.github.io/2025/09/23/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%
 https://alphazer01214.github.io/about/index.html
 https://alphazer01214.github.io/anime/index.html
 https://alphazer01214.github.io/2025/07/07/%E4%BF%AE%E5%A4%8DEdge%E7%AA%97%E5%8F%A3%E6%98%BE%E7%A4%BA%E5%BC%82%E5%B8%B8%E7%9A%84%E9%97%AE%E9%A2%98/
-https://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/
 https://alphazer01214.github.io/music/index.html
 https://alphazer01214.github.io/books/index.html
 https://alphazer01214.github.io/anime/2025.html
@@ -32,6 +33,9 @@ https://alphazer01214.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/
 https://alphazer01214.github.io/tags/%E5%9B%BE%E8%AE%BA/
 https://alphazer01214.github.io/tags/%E6%A0%91/
 https://alphazer01214.github.io/tags/Windows/
+https://alphazer01214.github.io/tags/OpenCV/
+https://alphazer01214.github.io/tags/%E6%95%99%E7%A8%8B/
 https://alphazer01214.github.io/categories/Computer-Science/
 https://alphazer01214.github.io/categories/Routine/
 https://alphazer01214.github.io/categories/Technical/
+https://alphazer01214.github.io/categories/Tutorial/

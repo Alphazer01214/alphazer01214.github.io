@@ -6,7 +6,7 @@
   <link href="https://alphazer01214.github.io/atom.xml" rel="self"/>
   
   <link href="https://alphazer01214.github.io/"/>
-  <updated>2025-12-03T02:56:23.818Z</updated>
+  <updated>2025-12-13T09:02:03.934Z</updated>
   <id>https://alphazer01214.github.io/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OpenCV配置踩坑踩麻了——OpenCV+Freetype+CLion配置心得</title>
+    <link href="https://alphazer01214.github.io/2025/12/06/OpenCV%E9%85%8D%E7%BD%AE%E8%B8%A9%E5%9D%91%E8%B8%A9%E9%BA%BB%E4%BA%86/"/>
+    <id>https://alphazer01214.github.io/2025/12/06/OpenCV%E9%85%8D%E7%BD%AE%E8%B8%A9%E5%9D%91%E8%B8%A9%E9%BA%BB%E4%BA%86/</id>
+    <published>2025-12-05T16:06:28.000Z</published>
+    <updated>2025-12-13T09:02:03.934Z</updated>
+    
+    <content type="html"><![CDATA[<h1>真的爆了</h1><p>事情最开始是小学期希望把 Python 的 Aimbot 移植到 C++ 里面，于是就要用到 OpenCV 。当时配了半天都只停在 Cmake 的阶段，最后放弃了，，，</p><p>而最近希望用C++做一个小应用，需要使用OpenCV+Freetype的组合，又不得不开始配置 OpenCV，，，</p><p>期间尝试了很多方法，包括下载源码编译，下载已编译的文件，使用 <code>vcpkg</code> 等等。。。最后还是不得不使用 <code>vcpkg</code>，，，</p><p>这篇文章我先介绍一个失败的方法，再介绍最终解决方案</p><h1>准备工作</h1><table><thead><tr><th>组件</th><th>说明</th></tr></thead><tbody><tr><td><strong>系统</strong></td><td>Windows 11</td></tr><tr><td><strong>编译器</strong></td><td>Visual Studio（安装时记得勾选 <strong>C++ 桌面开发</strong> 工作负载）</td></tr><tr><td><strong>IDE</strong></td><td>CLion（我用的 IDE）</td></tr><tr><td><strong>包管理</strong></td><td><a href="https://github.com/microsoft/vcpkg">vcpkg</a></td></tr></tbody></table><blockquote><p>注：即使你用 CLion，<strong>也必须装 VS</strong> —— 因为 Windows 下 C++ 编译链（MSVC）依赖 VS 的工具链，CLion 只是调用它。</p></blockquote><h1>尝试一：源码编译</h1><h2 id="额外准备">额外准备</h2><ul><li>OpenCV 源码（<a href="https://github.com/opencv/opencv">github.com/opencv/opencv</a>）</li><li>OpenCV contrib 源码（<a href="https://github.com/opencv/opencv_contrib">github.com/opencv/opencv_contrib</a>）<br>（FreeType 支持在 <code>contrib</code> 里！）</li><li>CMake GUI（官网下载即可）</li></ul><p>OpenCV相关资源都可以在Github找到，下载并解压，如图所示：<br><img src="/images/1.png" alt="1"></p><h2 id="CMake-配置">CMake 配置</h2><p>安装并打开CMake(过程略)，此时需要选择 source code 与 build binary 的目录，我按照如下配置</p><p><img src="/images/2.png" alt="2"></p><p>首次 configure 会弹出 generator 选择窗口，选你安装的 VS 版本（如 <code>Visual Studio 17 2022</code>），平台选 <code>x64</code>，<strong>用 default native compilers</strong>。</p><p><img src="/images/3.png" alt="3"></p><p>点击finish 开始配置。此处有一个坑点：CMake会下载一些包，但由于国内网络问题很可能会失败，比如翻日志会出现这些提示：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">IPPICV: Downloading ippicv_2022.1.0_win_intel64_20250130_general.zip from https://raw.githubusercontent.com/opencv/opencv_3rdparty/767426b2a40a011eb2fa7f44c677c13e60e205ad/ippicv/ippicv_2022.1.0_win_intel64_20250130_general.zip</span><br><span class="line">Try 1 failed</span><br><span class="line">CMake Warning at cmake/OpenCVDownload.cmake:251 (message):</span><br><span class="line">  IPPICV: Download failed: 56;&quot;Failure when receiving data from the peer&quot;</span><br><span class="line"></span><br><span class="line">  For details please refer to the download log file:</span><br><span class="line"></span><br><span class="line">  D:/Code/OpenCV/opencv-build/CMakeDownloadLog.txt</span><br></pre></td></tr></table></figure><p>那就只能手动下载失败的 zip 包（用代理 or 手动拼 URL 丢进浏览器），放到对应临时目录，比如：</p><p><code>D:\Code\OpenCV\opencv-build\3rdparty\ippicv\ippicv_2022.1.0_win_intel64_20250130_general.zip</code></p><p>然后<strong>重新点 Configure</strong>，它会跳过下载直接用本地文件。</p><p>配置结束后，需要修改一些键值。</p><p>找到 OPENCV_EXTRE_MODULES_PATH ，将目录改为类似 <code>D:\Code\OpenCV\opencv_contrib-4.x\modules</code> 。</p><p><img src="/images/4.png" alt="4"></p><p>由于我需要freetype，于是还勾选了 WITH_FREETYPE。此外，还建议再勾选 BUILD_opencv_world ，然后点击configure，generate。</p><h2 id="编译集成">编译集成</h2><ul><li>用 VS 打开 <code>OpenCV.sln</code>，<strong>Release + x64</strong> 模式编译 <code>INSTALL</code> 项目（它会把头文件、lib、dll 拷到 <code>install</code> 目录）</li><li>然后在自己项目的 <code>CMakeLists.txt</code> 里设：<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(OpenCV_DIR <span class="string">&quot;D:/Code/OpenCV/opencv-build/install&quot;</span>)</span><br><span class="line"><span class="keyword">find_package</span>(OpenCV REQUIRED)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(your_target <span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure></li></ul><p>理论上之后只要在项目的CMakeList设置好OpenCV_DIR就可以了，反正我是没成功。查了半天资料发现是因为要想使用Freetype，还需要自己再编译Freetype和Harfbuzz两个库，我是想不折腾了，于是只能用更方便的vcpkg。</p><h1>尝试二：vcpkg</h1><h2 id="安装-vcpkg">安装 vcpkg</h2><ol><li><p>在合适位置（如 <code>D:\Code\vcpkg</code>）打开 PowerShell：</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/microsoft/vcpkg</span><br><span class="line"><span class="built_in">cd</span> vcpkg</span><br><span class="line">.\bootstrap<span class="literal">-vcpkg</span>.bat</span><br></pre></td></tr></table></figure><blockquote><p>注意：<strong>不要想着避开 git clone 的步骤！！</strong></p></blockquote></li><li><p><strong>集成到 Visual Studio（重要！）</strong>：</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\vcpkg integrate install</span><br></pre></td></tr></table></figure><blockquote><p>这步会让 VS 自动识别 vcpkg 安装的库，无需手动设 include/lib 路径！</p></blockquote></li><li><p>环境变量设置：</p><p>在 PATH 中添加 vcpkg 的目录，使得能够在 console 直接运行 <code>vcpkg</code> 命令。</p></li></ol><h2 id="安装-OpenCV-FreeType">安装 OpenCV + FreeType</h2><p>一条命令解决：</p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 opencv4 + 所有默认 contrib 模块（含 freetype）</span></span><br><span class="line">vcpkg install opencv[<span class="type">contrib</span>]:x64<span class="literal">-windows</span></span><br></pre></td></tr></table></figure><blockquote><p>注意：<strong>vcpkg文件夹会变得非常大！务必预留足够空间。</strong></p></blockquote><h2 id="在-CLion-中配置-vcpkg">在 CLion 中配置 vcpkg</h2><p>首先需要调出 vcpkg 窗口，可以在 <code>视图-&gt;工具窗口-&gt;vcpkg</code> 找到。</p><blockquote><p>注意：选择 vcpkg 经典， <strong>不要切到清单模式</strong>。</p></blockquote><p>接下来添加 vcpkg 即可，并找到 Open CV 安装即可。</p><blockquote><p>注意：opencv, opencv2, opencv4 等都尽量安装。</p></blockquote><p><img src="/images/5.png" alt="5"></p><p>然后在项目的 <code>CMakeLists.txt</code> 中写下这些内容(仅供参考)：</p><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.20</span>)</span><br><span class="line"><span class="keyword">project</span>(你的项目名称)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启用 vcpkg 工具链（关键！让 CMake 知道去哪找库）</span></span><br><span class="line"><span class="keyword">set</span>(CMAKE_TOOLCHAIN_FILE <span class="string">&quot;D:/Code/vcpkg/scripts/buildsystems/vcpkg.cmake&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_package</span>(OpenCV REQUIRED)</span><br><span class="line"><span class="keyword">add_executable</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> main.cpp)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span> <span class="variable">$&#123;OpenCV_LIBS&#125;</span>)</span><br></pre></td></tr></table></figure><h2 id="编译运行">编译运行</h2><p>CLion：Reload CMake → Build</p><p>以下是一个示例程序：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/freetype.hpp&gt;</span></span></span><br><span class="line"><span class="keyword">auto</span> ft2 = cv::freetype::<span class="built_in">createFreeType2</span>();</span><br><span class="line">ft2-&gt;<span class="built_in">loadFontData</span>(<span class="string">&quot;simhei.ttf&quot;</span>, <span class="number">0</span>);</span><br><span class="line">ft2-&gt;<span class="built_in">putText</span>(img, <span class="string">&quot;你好 OpenCV&quot;</span>, cv::<span class="built_in">Point</span>(<span class="number">50</span>,<span class="number">50</span>), <span class="number">32</span>, cv::<span class="built_in">Scalar</span>(<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>));</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1&gt;真的爆了&lt;/h1&gt;
+&lt;p&gt;事情最开始是小学期希望把 Python 的 Aimbot 移植到 C++ 里面，于是就要用到 OpenCV 。当时配了半天都只停在 Cmake 的阶段，最后放弃了，，，&lt;/p&gt;
+&lt;p&gt;而最近希望用C++做一个小应用，需要使用OpenCV+Free</summary>
+      
+    
+    
+    
+    <category term="Tutorial" scheme="https://alphazer01214.github.io/categories/Tutorial/"/>
+    
+    
+    <category term="OpenCV" scheme="https://alphazer01214.github.io/tags/OpenCV/"/>
+    
+    <category term="教程" scheme="https://alphazer01214.github.io/tags/%E6%95%99%E7%A8%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>算法学习笔记——动态规划</title>
@@ -290,17 +318,18 @@
     <link href="https://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/"/>
     <id>https://alphazer01214.github.io/2025/01/14/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/</id>
     <published>2025-01-14T15:29:32.000Z</published>
-    <updated>2025-07-03T04:15:29.602Z</updated>
+    <updated>2025-12-13T09:01:27.480Z</updated>
     
-    <content type="html"><![CDATA[<p>It’s actually a test.</p><p>试试加入图片。</p><p><img src="/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/1.jpg"></p><p><img src="/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/2.jpg"></p><p><img src="/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/3.jpg"></p><p>虽然专辑到手了，但光驱还差个电源线（悲）</p><p>试了好几次终于是能显示图片了，图片资源放在img文件夹中，还不知道要怎么实现单独给post开个资源文件夹，img文件夹的资源是网站共享的，而且在Typora编辑的时候没办法看到图片（悲）</p>]]></content>
+    <content type="html"><![CDATA[<p>It’s actually a test.</p><p>试试加入图片。</p><p><img src="/images/1.jpg" alt=""></p><p><img src="/images/2.jpg" alt=""></p><p><img src="/images/3.jpg" alt=""></p><p>虽然专辑到手了，但光驱还差个电源线（悲）</p><p>试了好几次终于是能显示图片了，图片资源放在img文件夹中，还不知道要怎么实现单独给post开个资源文件夹，img文件夹的资源是网站共享的，而且在Typora编辑的时候没办法看到图片（悲）</p>]]></content>
     
     
       
       
     <summary type="html">&lt;p&gt;It’s actually a test.&lt;/p&gt;
 &lt;p&gt;试试加入图片。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/%E7%9F%A5%E6%9B%B4%E9%B8%9F%E4%B8%93%E8%BE%91/1.jpg&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/%E7%9F%A5%</summary>
+&lt;p&gt;&lt;img src=&quot;/images/1.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/im</summary>
       
     
     
