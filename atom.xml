@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Takamatus Tomori’s Blog</title>
+  <title>Alphazer01214’s Blog</title>
   
-  <subtitle>Takamatus Tomori的个人主页</subtitle>
+  <subtitle>Alpha_零能的个人主页</subtitle>
   <link href="https://alphazer01214.github.io/atom.xml" rel="self"/>
   
   <link href="https://alphazer01214.github.io/"/>
-  <updated>2026-01-20T15:56:09.057Z</updated>
+  <updated>2026-03-01T14:32:38.656Z</updated>
   <id>https://alphazer01214.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="https://alphazer01214.github.io/2026/03/01/%E5%9F%BA%E4%BA%8ESamba+WireGuard%E7%9A%84%E8%BF%9C%E7%A8%8BGalgame%E6%B8%B8%E7%8E%A9%E6%96%B9%E6%A1%88/"/>
+    <id>https://alphazer01214.github.io/2026/03/01/%E5%9F%BA%E4%BA%8ESamba+WireGuard%E7%9A%84%E8%BF%9C%E7%A8%8BGalgame%E6%B8%B8%E7%8E%A9%E6%96%B9%E6%A1%88/</id>
+    <published>2026-03-01T14:31:29.075Z</published>
+    <updated>2026-03-01T14:32:38.656Z</updated>
+    
+    <content type="html"><![CDATA[<p>这是</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;这是&lt;/p&gt;
+</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>写在爆亏几千块之时</title>
